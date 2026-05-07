@@ -68,7 +68,7 @@ export default function FilterPills({ activeId, onChange, keyRoot }) {
             position: 'fixed',
             top: dropPos.top,
             left: dropPos.left,
-            background: '#1a1a24',
+            background: 'var(--bg2)',
             border: '0.5px solid rgba(255,255,255,0.14)',
             borderRadius: 14,
             padding: 6,

@@ -72,8 +72,8 @@ function MovementCard({ move }) {
     <div style={{
       display:'flex',alignItems:'center',gap:10,
       padding:'8px 12px',borderRadius:10,
-      background:'rgba(255,255,255,0.03)',
-      border:'0.5px solid rgba(255,255,255,0.07)',
+      background:'var(--surface)',
+      border:'0.5px solid var(--border)',
     }}>
       <span style={{ fontSize:18,fontFamily:'"DM Serif Display",serif',color:ACCENT,minWidth:40,textAlign:'center' }}>
         {move.targetChord}
@@ -156,7 +156,7 @@ export default function KeyDetectionPanel({ pitchClassAccum, chordHistory, curre
 
   if (!result) return (
     <div style={{
-      background:'rgba(255,255,255,0.02)',border:'0.5px solid rgba(255,255,255,0.07)',
+      background:'var(--bg3)',border:'0.5px solid var(--border)',
       borderRadius:16,padding:'2rem',textAlign:'center',
     }}>
       <p style={{ fontSize:28,opacity:.15,marginBottom:12 }}>♩</p>
@@ -215,7 +215,7 @@ export default function KeyDetectionPanel({ pitchClassAccum, chordHistory, curre
       </div>
 
       {/* ── Pitch histogram ── */}
-      <div style={{ background:'rgba(255,255,255,0.02)',border:'0.5px solid rgba(255,255,255,0.07)',borderRadius:14,padding:'1rem' }}>
+      <div style={{ background:'var(--bg3)',border:'0.5px solid var(--border)',borderRadius:14,padding:'1rem' }}>
         <div style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'0.75rem',display:'flex',justifyContent:'space-between' }}>
           <span>Pitch energy</span>
           <span style={{ color:'rgba(200,245,90,0.4)' }}>■ in scale &nbsp; <span style={{ color:ACCENT }}>■ root</span></span>
@@ -224,7 +224,7 @@ export default function KeyDetectionPanel({ pitchClassAccum, chordHistory, curre
       </div>
 
       {/* ── Scale degrees (clickable) ── */}
-      <div style={{ background:'rgba(255,255,255,0.02)',border:'0.5px solid rgba(255,255,255,0.07)',borderRadius:14,padding:'1rem' }}>
+      <div style={{ background:'var(--bg3)',border:'0.5px solid var(--border)',borderRadius:14,padding:'1rem' }}>
         <div style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'0.875rem' }}>
           Scale — click a chord to see likely movements
         </div>
@@ -253,7 +253,7 @@ export default function KeyDetectionPanel({ pitchClassAccum, chordHistory, curre
 
       {/* ── Likely movements ── */}
       {movements.length > 0 && (
-        <div style={{ background:'rgba(255,255,255,0.02)',border:'0.5px solid rgba(255,255,255,0.07)',borderRadius:14,padding:'1rem' }}>
+        <div style={{ background:'var(--bg3)',border:'0.5px solid var(--border)',borderRadius:14,padding:'1rem' }}>
           <div style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'0.875rem' }}>
             From {activeDegree?.chord} ({activeDegree?.roman}) — likely next chords
           </div>

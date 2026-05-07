@@ -31,7 +31,7 @@ export default function SaveModal({ onClose, chordHistory, songKey, bpm, mode })
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          background: '#18181f', border: '0.5px solid rgba(255,255,255,0.12)',
+          background: 'var(--bg3)', border: '0.5px solid rgba(255,255,255,0.12)',
           borderRadius: 20, padding: '1.5rem', width: '100%', maxWidth: 400, margin: '0 1rem',
         }}
       >

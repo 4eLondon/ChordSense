@@ -95,12 +95,12 @@ export default function App() {
   const gap = isMobile ? '0.875rem' : '1.25rem'
 
   return (
-    <div style={{ minHeight:'100vh', background:'#0a0a0f', display:'flex', flexDirection:'column', fontFamily:'var(--font-body)', color:'var(--text)' }}>
+    <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:'column', fontFamily:'var(--font-body)', color:'var(--text)' }}>
 
       {/* ── HEADER ── */}
       <header style={{
         borderBottom: '0.5px solid rgba(255,255,255,0.07)',
-        background: 'rgba(10,10,15,0.96)',
+        background: 'var(--header-bg)',
         backdropFilter: 'blur(14px)',
         position: 'sticky', top: 0, zIndex: 100,
       }}>
@@ -119,7 +119,7 @@ export default function App() {
           </div>
 
           {/* Mode toggle — always visible */}
-          <div style={{ display:'flex', background:'rgba(255,255,255,0.05)', borderRadius:9, padding:3, gap:2 }}>
+          <div style={{ display:'flex', background:'var(--bg3)', borderRadius:9, padding:3, gap:2 }}>
             {[{ id:'file', label: isMobile ? '♫' : '♫ Song file' },
               { id:'mic',  label: isMobile ? '🎙' : '🎙 Live mic'  }].map(({ id, label }) => (
               <button key={id}
@@ -171,7 +171,7 @@ export default function App() {
                 color: simplified ? '#c8f55a' : 'rgba(255,255,255,0.4)',
                 fontFamily:'var(--font-mono)', transition:'all 0.15s',
               }}>{simplified ? '✦ Simple' : '✧ Simplify'}</button>
-              <div style={{ display:'flex', background:'rgba(255,255,255,0.05)', borderRadius:9, padding:3, gap:2 }}>
+              <div style={{ display:'flex', background:'var(--bg3)', borderRadius:9, padding:3, gap:2 }}>
                 {[['raw','Raw'],['smooth','Smooth'],['clean','Clean']].map(([id, label]) => (
                   <button key={id} onClick={() => setSmoothing(id)} style={{
                     padding:'5px 11px', borderRadius:7, fontSize:12, cursor:'pointer',
@@ -217,7 +217,7 @@ export default function App() {
         {/* Row 2 (mobile only): controls drawer */}
         {isMobile && showControls && (
           <div style={{
-            borderTop: '0.5px solid rgba(255,255,255,0.06)',
+            borderTop: '0.5px solid var(--border)',
             padding: '0.75rem 1rem',
             display: 'flex', flexDirection: 'column', gap: '0.625rem',
           }}>
@@ -251,7 +251,7 @@ export default function App() {
             </div>
             {/* Row: smoothing + bpm */}
             <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-              <div style={{ display:'flex', background:'rgba(255,255,255,0.05)', borderRadius:9, padding:3, gap:2 }}>
+              <div style={{ display:'flex', background:'var(--bg3)', borderRadius:9, padding:3, gap:2 }}>
                 {[['raw','Raw'],['smooth','Smooth'],['clean','Clean']].map(([id, label]) => (
                   <button key={id} onClick={() => setSmoothing(id)} style={{
                     padding:'5px 12px', borderRadius:7, fontSize:12, cursor:'pointer',
@@ -289,7 +289,7 @@ export default function App() {
                 style={{
                   flex:1, display:'flex', flexDirection:'column',
                   alignItems:'center', justifyContent:'center',
-                  border:`1.5px dashed ${dragOver ? '#c8f55a' : 'rgba(255,255,255,0.12)'}`,
+                  border:`1.5px dashed ${dragOver ? 'var(--accent)' : 'var(--border2)'}`,
                   borderRadius:20,
                   padding: isMobile ? '2rem 1.25rem' : '3rem',
                   cursor:'pointer', background: dragOver ? 'rgba(200,245,90,0.03)' : 'transparent',
@@ -315,7 +315,7 @@ export default function App() {
               <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:'1.5rem' }}>
                 <div style={{ fontFamily:'var(--font-display)', fontSize: isMobile ? 24 : 32, color:'rgba(255,255,255,0.6)' }}>Analyzing song…</div>
                 <div style={{ width:'100%', maxWidth:400 }}>
-                  <div style={{ height:6, background:'rgba(255,255,255,0.07)', borderRadius:3, overflow:'hidden' }}>
+                  <div style={{ height:6, background:'var(--bg4)', borderRadius:3, overflow:'hidden' }}>
                     <div style={{ height:'100%', width:`${fileProgress}%`, background:'var(--accent)', borderRadius:3, transition:'width 0.3s ease' }} />
                   </div>
                   <p style={{ textAlign:'center', marginTop:10, fontSize:12, color:'rgba(255,255,255,0.3)', fontFamily:'var(--font-mono)' }}>
@@ -376,7 +376,7 @@ export default function App() {
       {mode === 'file' && hasFile && duration > 0 && (
         <div style={{
           position:'sticky', bottom:0,
-          background:'rgba(10,10,15,0.97)', backdropFilter:'blur(16px)',
+          background:'var(--header-bg)', backdropFilter:'blur(16px)',
           borderTop:'0.5px solid rgba(255,255,255,0.07)',
           padding: isMobile ? '0.75rem 1rem' : '0.875rem 1.5rem',
           display:'flex', alignItems:'center', gap: isMobile ? '0.625rem' : '1rem',
@@ -398,7 +398,7 @@ export default function App() {
 
           {/* Seek — also handles touch */}
           <div
-            style={{ flex:1, height: isMobile ? 6 : 5, background:'rgba(255,255,255,0.08)', borderRadius:3, cursor:'pointer', position:'relative', touchAction:'none' }}
+            style={{ flex:1, height: isMobile ? 6 : 5, background:'var(--bg4)', borderRadius:3, cursor:'pointer', position:'relative', touchAction:'none' }}
             onClick={e => { const r=e.currentTarget.getBoundingClientRect(); seekTo(((e.clientX-r.left)/r.width)*duration) }}
             onTouchEnd={e => { const r=e.currentTarget.getBoundingClientRect(); const t=e.changedTouches[0]; seekTo(Math.max(0,Math.min(1,((t.clientX-r.left)/r.width)))*duration) }}
           >

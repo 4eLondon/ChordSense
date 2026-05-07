@@ -87,7 +87,7 @@ export default function ThemeSettings({ themeId, accentId, fontSizeId, onTheme, 
   }
 
   const panel = {
-    background: 'var(--bg2)',
+    background: 'var(--card-bg)',
     border: '0.5px solid var(--border2)',
     borderRadius: isMobile ? '20px 20px 0 0' : 20,
     padding: isMobile ? '1.25rem 1.25rem 2rem' : '1.5rem',

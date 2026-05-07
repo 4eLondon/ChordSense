@@ -244,8 +244,8 @@ export default function VocalKeyFinder() {
 
       {/* ── Header / controls ── */}
       <div style={{
-        background: 'rgba(255,255,255,0.02)',
-        border: '0.5px solid rgba(255,255,255,0.08)',
+        background: 'var(--bg3)',
+        border: '0.5px solid var(--border)',
         borderRadius: 14, padding: '1rem',
         display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap',
       }}>
@@ -262,7 +262,7 @@ export default function VocalKeyFinder() {
           {isListening && (
             <button onClick={handleReset} style={{
               padding:'8px 14px', borderRadius:9, fontSize:12, cursor:'pointer',
-              background:'rgba(255,255,255,0.05)', color:'rgba(255,255,255,0.45)',
+              background:'var(--bg4)', color:'rgba(255,255,255,0.45)',
               border:'0.5px solid rgba(255,255,255,0.1)', fontFamily:'"DM Mono",monospace',
             }}>
               Reset
@@ -313,8 +313,8 @@ export default function VocalKeyFinder() {
       {/* ── Live pitch display ── */}
       {isListening && (
         <div style={{
-          background: 'rgba(255,255,255,0.02)',
-          border: '0.5px solid rgba(255,255,255,0.08)',
+          background: 'var(--bg3)',
+          border: '0.5px solid var(--border)',
           borderRadius: 14, padding: '1rem',
           display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap',
         }}>
@@ -330,7 +330,7 @@ export default function VocalKeyFinder() {
                 color: pitchConfidence > 0.78 ? ACCENT : 'rgba(255,255,255,0.2)',
                 lineHeight:1, transition:'color 0.2s',
               }}>
-                {currentNote ? currentNote.replace(/[0-9]/g,'') : ':'}
+                {currentNote ? currentNote.replace(/[0-9]/g,'') : '—'}
               </span>
               {currentNote && (
                 <span style={{ fontSize:16, fontFamily:'"DM Mono",monospace', color:'rgba(200,245,90,0.4)' }}>
@@ -375,7 +375,7 @@ export default function VocalKeyFinder() {
       {/* ── Note trail ── */}
       {noteHistory.length > 0 && (
         <div style={{
-          background:'rgba(255,255,255,0.02)', border:'0.5px solid rgba(255,255,255,0.07)',
+          background:'var(--bg3)', border:'0.5px solid var(--border)',
           borderRadius:12, padding:'0.75rem 1rem',
         }}>
           <span style={{ fontSize:9,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',letterSpacing:'.08em',textTransform:'uppercase',display:'block',marginBottom:8 }}>
@@ -395,10 +395,10 @@ export default function VocalKeyFinder() {
           <div style={{ flex:1 }}>
             <div style={{ fontSize:12, color:YELLOW, marginBottom:6 }}>
               {dataStrength < 0.08
-                ? (signalQuality < 0.15 ? 'No signal detected : try raising Mic Gain ↑' : 'Waiting for the singer to start…')
+                ? (signalQuality < 0.15 ? 'No signal detected — try raising Mic Gain ↑' : 'Waiting for the singer to start…')
                 : dataStrength < 0.3
-                ? 'Hearing the melody : keep going…'
-                : 'Almost there : a few more bars…'
+                ? 'Hearing the melody — keep going…'
+                : 'Almost there — a few more bars…'
               }
             </div>
             <div style={{ height:4, background:'rgba(255,255,255,0.07)', borderRadius:2, overflow:'hidden' }}>
@@ -438,7 +438,7 @@ export default function VocalKeyFinder() {
               </div>
               <div style={{ fontSize:11,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.3)',marginTop:4 }}>
                 {keyResult.confidenceLabel} confidence
-                {keyResult.confidence < 0.55 && ' : sing more for better accuracy'}
+                {keyResult.confidence < 0.55 && ' — sing more for better accuracy'}
               </div>
             </div>
 
@@ -465,7 +465,7 @@ export default function VocalKeyFinder() {
 
             {/* Chromatic pitch wheel */}
             <div style={{
-              background:'rgba(255,255,255,0.02)', border:'0.5px solid rgba(255,255,255,0.07)',
+              background:'var(--bg3)', border:'0.5px solid var(--border)',
               borderRadius:14, padding:'1rem', flex:'0 0 auto',
             }}>
               <span style={{ fontSize:9,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',letterSpacing:'.08em',textTransform:'uppercase',display:'block',marginBottom:8 }}>
@@ -481,7 +481,7 @@ export default function VocalKeyFinder() {
             {/* Chords to play */}
             <div style={{ flex:1, width:'100%', display:'flex', flexDirection:'column', gap:'0.875rem' }}>
               <div style={{
-                background:'rgba(255,255,255,0.02)', border:'0.5px solid rgba(255,255,255,0.07)',
+                background:'var(--bg3)', border:'0.5px solid var(--border)',
                 borderRadius:14, padding:'1rem',
               }}>
                 <span style={{ fontSize:9,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',letterSpacing:'.08em',textTransform:'uppercase',display:'block',marginBottom:'0.875rem' }}>
@@ -493,7 +493,7 @@ export default function VocalKeyFinder() {
                   ))}
                 </div>
                 <p style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.2)',marginTop:'0.75rem',lineHeight:1.6 }}>
-                  Highlighted: I, IV, V : the three primary chords. These alone will work for most songs.
+                  Highlighted: I, IV, V — the three primary chords. These alone will work for most songs.
                 </p>
               </div>
 
@@ -520,7 +520,7 @@ export default function VocalKeyFinder() {
                   })}
                 </div>
                 <p style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.3)',marginTop:8 }}>
-                  I → IV → V → vi : works for most pop, gospel, and folk melodies
+                  I → IV → V → vi — works for most pop, gospel, and folk melodies
                 </p>
               </div>
             </div>

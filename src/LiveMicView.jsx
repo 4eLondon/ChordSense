@@ -107,8 +107,8 @@ function PredictionCard({ prediction, rank, keyRoot, simplifyFn, isMobile = fals
             <span key={i} style={{
               fontSize: 10, fontFamily: '"DM Mono", monospace',
               color, opacity: 0.75,
-              background: 'rgba(255,255,255,0.05)',
-              border: '0.5px solid rgba(255,255,255,0.08)',
+              background: 'var(--bg4)',
+              border: '0.5px solid var(--border)',
               borderRadius: 5, padding: '1px 6px',
             }}>{n}</span>
           ))}
@@ -138,8 +138,8 @@ const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 function KeySelector({ keyRoot, keyMode, onKeyRoot, onKeyMode }) {
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.02)',
-      border: '0.5px solid rgba(255,255,255,0.08)',
+      background: 'var(--bg3)',
+      border: '0.5px solid var(--border)',
       borderRadius: 12,
       padding: '0.875rem 1rem',
       display: 'flex',
@@ -170,7 +170,7 @@ function KeySelector({ keyRoot, keyMode, onKeyRoot, onKeyMode }) {
       </div>
 
       {/* Major / Minor */}
-      <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: 8, padding: 3, gap: 2 }}>
+      <div style={{ display: 'flex', background: 'var(--bg4)', borderRadius: 8, padding: 3, gap: 2 }}>
         {['major', 'minor'].map(m => (
           <button key={m} onClick={() => onKeyMode(m)}
             style={{
@@ -262,8 +262,8 @@ export default function LiveMicView({
 
       {/* ── Mic controls bar ── */}
       <div style={{
-        background: 'rgba(255,255,255,0.02)',
-        border: '0.5px solid rgba(255,255,255,0.08)',
+        background: 'var(--bg3)',
+        border: '0.5px solid var(--border)',
         borderRadius: 12,
         padding: '0.75rem 1rem',
         display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap',
@@ -454,8 +454,8 @@ export default function LiveMicView({
       {/* ── Chord history strip ── */}
       {chordHistory.length > 0 && (
         <div style={{
-          background: 'rgba(255,255,255,0.02)',
-          border: '0.5px solid rgba(255,255,255,0.07)',
+          background: 'var(--bg3)',
+          border: '0.5px solid var(--border)',
           borderRadius: 12, overflow: 'hidden',
         }}>
           <div style={{ padding: '0.6rem 1rem', borderBottom: '0.5px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
