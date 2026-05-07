@@ -91,7 +91,7 @@ export function getRomanNumeral(chordName, keyRoot, keyMode = 'major') {
 
 export const FILTER_MODES = [
   { id: 'all',   label: 'All chords',  degrees: null,        description: 'Show every detected chord' },
-  { id: '145',   label: '1 - 4 - 5',  degrees: [1, 4, 5],   description: 'Primary chords (I IV V) — gospel, blues, folk' },
+  { id: '145',   label: '1 - 4 - 5',  degrees: [1, 4, 5],   description: 'Primary chords (I IV V) : gospel, blues, folk' },
   { id: '125',   label: '1 - 2 - 5',  degrees: [1, 2, 5],   description: 'Jazz/R&B movement (I ii V)' },
   { id: '1645',  label: '1-6-4-5',    degrees: [1, 6, 4, 5], description: 'Classic pop progression (I vi IV V)' },
   { id: '1564',  label: '1-5-6-4',    degrees: [1, 5, 6, 4], description: 'Modern pop (I V vi IV)' },
