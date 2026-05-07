@@ -34,6 +34,12 @@ export default function RulerTimeline({
   const containerRef = useRef(null)
   const isDragging = useRef(false)
 
+  // Resolve CSS vars for JSX (canvas resolves its own inside draw())
+  const cs       = typeof window !== 'undefined' ? getComputedStyle(document.documentElement) : null
+  const C_BG     = cs?.getPropertyValue('--bg').trim()     || '#0a0a0f'
+  const C_ACCENT = cs?.getPropertyValue('--accent').trim() || '#c8f55a'
+  const C_BORDER = cs?.getPropertyValue('--border2').trim()|| 'rgba(255,255,255,0.09)'
+
   const totalW = Math.max(800, Math.ceil(duration * PX_PER_SEC) + LABEL_W + 120)
   const canvasH = RULER_H + TRACK_H + 2
 
@@ -283,41 +289,41 @@ export default function RulerTimeline({
 
   return (
     <div style={{
-      background: C_BG,
-      border: '0.5px solid rgba(255,255,255,0.09)',
+      background: 'var(--bg)',
+      border: '0.5px solid var(--border2)',
       borderRadius: 16,
       overflow: 'hidden',
     }}>
       {/* Header */}
       <div style={{
         padding: '10px 16px',
-        borderBottom: '0.5px solid rgba(255,255,255,0.07)',
+        borderBottom: '0.5px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 16,
       }}>
-        <span style={{ fontSize: 10, fontFamily: '"DM Mono", monospace', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ fontSize: 10, fontFamily: '"DM Mono", monospace', color: 'var(--text3)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           Chord Timeline
         </span>
 
         {/* Color legend */}
         <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
           {[
-            { color: C_ACCENT, label: 'Major' },
+            { color: 'var(--accent)', label: 'Major' },
             { color: '#6bb5ff', label: 'Minor / 7th' },
             { color: '#ff6b6b', label: 'Dim' },
             { color: '#b06bff', label: 'Aug' },
             { color: '#5adcc8', label: 'Sus' },
           ].map(({ color, label }) => (
-            <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, fontFamily: '"DM Mono", monospace', color: 'rgba(255,255,255,0.35)' }}>
+            <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, fontFamily: '"DM Mono", monospace', color: 'var(--text3)' }}>
               <span style={{ width: 8, height: 8, borderRadius: 2, background: color, display: 'inline-block', flexShrink: 0 }} />
               {label}
             </span>
           ))}
         </div>
 
-        <span style={{ fontSize: 10, fontFamily: '"DM Mono", monospace', color: 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: 10, fontFamily: '"DM Mono", monospace', color: 'var(--text3)', whiteSpace: 'nowrap' }}>
           {timeline.length} chords · drag to seek
         </span>
       </div>

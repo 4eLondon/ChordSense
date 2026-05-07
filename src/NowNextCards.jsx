@@ -92,7 +92,7 @@ function ChordCard({ chordName, role, keyRoot, timeUntil, isMobile = false }) {
       {/* Big chord name */}
       <div style={{ textAlign: 'center', lineHeight: 1, padding: '0.25rem 0' }}>
         {isEmpty ? (
-          <span style={{ fontSize: 52, fontFamily: '"DM Serif Display", serif', color: 'rgba(255,255,255,0.15)' }}>:</span>
+          <span style={{ fontSize: 52, fontFamily: '"DM Serif Display", serif', color: 'rgba(255,255,255,0.15)' }}>—</span>
         ) : (
           <span style={{ fontFamily: '"DM Serif Display", serif', lineHeight: 1, color: accentColor }}>
             <span style={{ fontSize: 'clamp(44px, 6vw, 68px)' }}>{root}</span>

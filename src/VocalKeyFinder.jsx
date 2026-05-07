@@ -330,7 +330,7 @@ export default function VocalKeyFinder() {
                 color: pitchConfidence > 0.78 ? ACCENT : 'rgba(255,255,255,0.2)',
                 lineHeight:1, transition:'color 0.2s',
               }}>
-                {currentNote ? currentNote.replace(/[0-9]/g,'') : ':'}
+                {currentNote ? currentNote.replace(/[0-9]/g,'') : '—'}
               </span>
               {currentNote && (
                 <span style={{ fontSize:16, fontFamily:'"DM Mono",monospace', color:'rgba(200,245,90,0.4)' }}>
@@ -395,10 +395,10 @@ export default function VocalKeyFinder() {
           <div style={{ flex:1 }}>
             <div style={{ fontSize:12, color:YELLOW, marginBottom:6 }}>
               {dataStrength < 0.08
-                ? (signalQuality < 0.15 ? 'No signal detected : try raising Mic Gain ↑' : 'Waiting for the singer to start…')
+                ? (signalQuality < 0.15 ? 'No signal detected — try raising Mic Gain ↑' : 'Waiting for the singer to start…')
                 : dataStrength < 0.3
-                ? 'Hearing the melody : keep going…'
-                : 'Almost there : a few more bars…'
+                ? 'Hearing the melody — keep going…'
+                : 'Almost there — a few more bars…'
               }
             </div>
             <div style={{ height:4, background:'rgba(255,255,255,0.07)', borderRadius:2, overflow:'hidden' }}>
@@ -438,7 +438,7 @@ export default function VocalKeyFinder() {
               </div>
               <div style={{ fontSize:11,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.3)',marginTop:4 }}>
                 {keyResult.confidenceLabel} confidence
-                {keyResult.confidence < 0.55 && ' : sing more for better accuracy'}
+                {keyResult.confidence < 0.55 && ' — sing more for better accuracy'}
               </div>
             </div>
 
@@ -493,7 +493,7 @@ export default function VocalKeyFinder() {
                   ))}
                 </div>
                 <p style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.2)',marginTop:'0.75rem',lineHeight:1.6 }}>
-                  Highlighted: I, IV, V : the three primary chords. These alone will work for most songs.
+                  Highlighted: I, IV, V — the three primary chords. These alone will work for most songs.
                 </p>
               </div>
 
@@ -520,7 +520,7 @@ export default function VocalKeyFinder() {
                   })}
                 </div>
                 <p style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.3)',marginTop:8 }}>
-                  I → IV → V → vi : works for most pop, gospel, and folk melodies
+                  I → IV → V → vi — works for most pop, gospel, and folk melodies
                 </p>
               </div>
             </div>
