@@ -226,7 +226,7 @@ export default function KeyDetectionPanel({ pitchClassAccum, chordHistory, curre
       {/* ── Scale degrees (clickable) ── */}
       <div style={{ background:'var(--bg3)',border:'0.5px solid var(--border)',borderRadius:14,padding:'1rem' }}>
         <div style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'0.875rem' }}>
-          Scale : click a chord to see likely movements
+          Scale — click a chord to see likely movements
         </div>
         <div style={{ display:'flex',gap:6,flexWrap:'wrap' }}>
           {result.scale.map((entry,i)=>(
@@ -241,12 +241,12 @@ export default function KeyDetectionPanel({ pitchClassAccum, chordHistory, curre
         </div>
         {currentDegree && !selectedDegree && (
           <p style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',marginTop:8 }}>
-            Showing movements for <span style={{ color:ACCENT }}>{currentDegree.chord}</span> ({currentDegree.roman}) : the chord you're playing now
+            Showing movements for <span style={{ color:ACCENT }}>{currentDegree.chord}</span> ({currentDegree.roman}) — the chord you're playing now
           </p>
         )}
         {selectedDegree && (
           <p style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',marginTop:8 }}>
-            Showing movements for <span style={{ color:ACCENT }}>{selectedDegree.chord}</span> ({selectedDegree.roman}) : <button onClick={()=>setSelectedDegree(null)} style={{ color:YELLOW,background:'none',border:'none',cursor:'pointer',fontSize:10,fontFamily:'inherit',padding:0 }}>reset</button>
+            Showing movements for <span style={{ color:ACCENT }}>{selectedDegree.chord}</span> ({selectedDegree.roman}) — <button onClick={()=>setSelectedDegree(null)} style={{ color:YELLOW,background:'none',border:'none',cursor:'pointer',fontSize:10,fontFamily:'inherit',padding:0 }}>reset</button>
           </p>
         )}
       </div>
@@ -255,7 +255,7 @@ export default function KeyDetectionPanel({ pitchClassAccum, chordHistory, curre
       {movements.length > 0 && (
         <div style={{ background:'var(--bg3)',border:'0.5px solid var(--border)',borderRadius:14,padding:'1rem' }}>
           <div style={{ fontSize:10,fontFamily:'"DM Mono",monospace',color:'rgba(255,255,255,0.25)',letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'0.875rem' }}>
-            From {activeDegree?.chord} ({activeDegree?.roman}) : likely next chords
+            From {activeDegree?.chord} ({activeDegree?.roman}) — likely next chords
           </div>
           <div style={{ display:'flex',flexDirection:'column',gap:6 }}>
             {movements.map((mv,i)=><MovementCard key={i} move={mv}/>)}

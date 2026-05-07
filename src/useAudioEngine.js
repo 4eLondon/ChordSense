@@ -77,6 +77,79 @@ function formatTime(secs) {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+
+// ── Pure JS FFT ───────────────────────────────────────────────────────────────
+// Replaces OfflineAudioContext per-frame analysis.
+// Cooley-Tukey in-place FFT — input must be power-of-2 length.
+function computeFFTMag(samples) {
+  const n = samples.length
+  const re = new Float32Array(samples) // copy
+  const im = new Float32Array(n)       // starts as zeros
+
+  // Bit-reversal permutation
+  for (let i = 1, j = 0; i < n; i++) {
+    let bit = n >> 1
+    for (; j & bit; bit >>= 1) j ^= bit
+    j ^= bit
+    if (i < j) {
+      let t = re[i]; re[i] = re[j]; re[j] = t
+      // im is all zero at start so no need to swap
+    }
+  }
+
+  // FFT butterfly
+  for (let len = 2; len <= n; len <<= 1) {
+    const ang  = -2 * Math.PI / len
+    const wCos = Math.cos(ang), wSin = Math.sin(ang)
+    for (let i = 0; i < n; i += len) {
+      let curCos = 1, curSin = 0
+      for (let k = 0; k < (len >> 1); k++) {
+        const p = i + k, q = p + (len >> 1)
+        const tRe = curCos * re[q] - curSin * im[q]
+        const tIm = curCos * im[q] + curSin * re[q]
+        re[q] = re[p] - tRe;  im[q] = im[p] - tIm
+        re[p] += tRe;          im[p] += tIm
+        const nc = curCos * wCos - curSin * wSin
+        curSin   = curCos * wSin + curSin * wCos
+        curCos   = nc
+      }
+    }
+  }
+
+  // Return magnitude spectrum in dB (only first half = positive frequencies)
+  const half = n >> 1
+  const mag  = new Float32Array(half)
+  for (let i = 0; i < half; i++) {
+    const m = Math.sqrt(re[i] * re[i] + im[i] * im[i]) / n
+    mag[i] = m > 1e-10 ? 20 * Math.log10(m) : -120
+  }
+  return mag
+}
+
+// Detect pitch classes from a magnitude spectrum (same logic as detectPitches
+// but works on the mag array from computeFFTMag instead of an AnalyserNode)
+function detectPitchesFromMag(mag, sampleRate, frameSize) {
+  const nyquist   = sampleRate / 2
+  const freqPerBin = nyquist / mag.length
+  const minBin    = Math.floor(27.5 / freqPerBin)
+  const maxBin    = Math.ceil(4200 / freqPerBin)
+  const threshold = -50  // dB
+
+  const notes = new Set()
+  for (let i = Math.max(1, minBin); i < Math.min(maxBin, mag.length - 1); i++) {
+    if (mag[i] > threshold && mag[i] > mag[i - 1] && mag[i] > mag[i + 1]) {
+      const denom = mag[i - 1] - 2 * mag[i] + mag[i + 1]
+      const delta = denom !== 0 ? 0.5 * (mag[i - 1] - mag[i + 1]) / denom : 0
+      const freq  = (i + delta) * freqPerBin
+      if (freq > 27 && freq < 4200) {
+        const midi = Math.round(12 * Math.log2(freq / 440) + 69)
+        if (midi >= 21 && midi <= 108) notes.add(midi % 12)
+      }
+    }
+  }
+  return [...notes]
+}
+
 export function useAudioEngine() {
   const audioCtxRef = useRef(null)
   const analyserRef = useRef(null)
@@ -221,33 +294,33 @@ export function useAudioEngine() {
       setDuration(audioBuffer.duration)
       setFileProgress(40)
 
-      const sampleRate = audioBuffer.sampleRate
+      const sampleRate  = audioBuffer.sampleRate
       const channelData = audioBuffer.getChannelData(0)
-      const frameSize = 8192
-      const hopSize = 4096
-      const timeline = []
+      // Use larger hop for speed: analyse one frame every ~0.5s
+      const frameSize   = 4096   // must be power of 2
+      const hopSize     = Math.floor(sampleRate * 0.35) // ~0.35s between frames
+      const timeline    = []
       const allPitchClasses = new Array(12).fill(0)
       const totalFrames = Math.floor((channelData.length - frameSize) / hopSize)
 
+      // Process in batches of 30 frames then yield to keep UI responsive
+      const BATCH = 30
       for (let frame = 0; frame < totalFrames; frame++) {
         const offset = frame * hopSize
-        const slice = channelData.slice(offset, offset + frameSize)
-        const offCtx = new OfflineAudioContext(1, frameSize, sampleRate)
-        const buf = offCtx.createBuffer(1, frameSize, sampleRate)
-        buf.copyToChannel(slice, 0)
-        const src = offCtx.createBufferSource()
-        src.buffer = buf
-        const analyser = offCtx.createAnalyser()
-        analyser.fftSize = frameSize
-        analyser.smoothingTimeConstant = 0
-        src.connect(analyser)
-        analyser.connect(offCtx.destination)
-        src.start()
-        await offCtx.startRendering()
+        // Extract frame — use subarray (no copy) then pass to FFT
+        const slice  = channelData.subarray(offset, offset + frameSize)
 
-        const pitches = detectPitches(analyser, sampleRate)
+        // Hann window to reduce spectral leakage
+        const windowed = new Float32Array(frameSize)
+        for (let i = 0; i < frameSize; i++) {
+          windowed[i] = slice[i] * (0.5 - 0.5 * Math.cos(2 * Math.PI * i / (frameSize - 1)))
+        }
+
+        const mag     = computeFFTMag(windowed)
+        const pitches = detectPitchesFromMag(mag, sampleRate, frameSize)
+
         if (pitches.length >= 2) {
-          const chord = pitchClassesToChord(pitches)
+          const chord     = pitchClassesToChord(pitches)
           const timestamp = offset / sampleRate
           pitches.forEach(pc => allPitchClasses[pc]++)
           if (chord) {
@@ -257,7 +330,12 @@ export function useAudioEngine() {
             }
           }
         }
-        if (frame % 20 === 0) setFileProgress(40 + Math.round((frame / totalFrames) * 50))
+
+        // Update progress + yield to UI thread every BATCH frames
+        if (frame % BATCH === 0) {
+          setFileProgress(40 + Math.round((frame / totalFrames) * 55))
+          await new Promise(r => setTimeout(r, 0))
+        }
       }
 
       const keyNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
