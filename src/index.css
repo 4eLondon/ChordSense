@@ -1,0 +1,58 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #18181f;
+  --bg4: #1e1e28;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --accent: #c8f55a;
+  --accent2: #a8d93a;
+  --text: #f0f0f5;
+  --text2: #9090a8;
+  --text3: #5a5a72;
+  --red: #ff6b6b;
+  --blue: #6bb5ff;
+  --purple: #b06bff;
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  /* Touch-friendly minimum tap target */
+  --tap-min: 44px;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  /* Prevent iOS bounce/overscroll on the body */
+  overscroll-behavior: none;
+}
+
+#root { min-height: 100vh; }
+
+/* Hide scrollbars globally but keep scroll */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input[type=range] { cursor: pointer; }
+
+/* Ensure touch targets are large enough on mobile */
+@media (max-width: 640px) {
+  button { min-height: var(--tap-min); }
+  input[type=range] { height: 32px; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
