@@ -6,6 +6,7 @@ import { getNextChord, getCurrentChordFromTimeline, chordMatchesFilter } from '.
 import { useBreakpoint } from './useBreakpoint'
 import NowNextCards from './NowNextCards'
 import RulerTimeline from './RulerTimeline'
+import NoteTimeline from './NoteTimeline'
 import FilterPills from './FilterPills'
 import SaveModal from './SaveModal'
 import LiveMicView from './LiveMicView'
@@ -24,7 +25,7 @@ export default function App() {
     isListening, startMic, stopMic,
     pitchClassAccum,
     isAnalyzingFile, fileProgress, analyzeFile,
-    fileChordTimeline, songKey, bpm,
+    fileChordTimeline, fileNoteTimeline, songKey, bpm,
     isPlaying, playbackTime, duration, togglePlayback, seekTo,
     currentChord: rawCurrentChord,
     detectedNotes, chordHistory,
@@ -40,6 +41,7 @@ export default function App() {
   const [dragOver, setDragOver] = useState(false)
   const [fileName, setFileName] = useState(null)
   const [showControls, setShowControls] = useState(false) // mobile: show extra controls
+  const [showNotes, setShowNotes] = useState(false) // ← NEW: toggle note timeline
   const fileInputRef = useRef(null)
 
   const display = useCallback(c => simplified ? simplifyChord(c) : c, [simplified])
@@ -193,6 +195,15 @@ export default function App() {
                   </span>}
                 </div>
               )}
+              {fileNoteTimeline.length > 0 && (
+                <button onClick={() => setShowNotes(s => !s)} style={{
+                  padding:'5px 12px', borderRadius:8, fontSize:12, cursor:'pointer',
+                  background: showNotes ? 'rgba(200,245,90,0.10)' : 'rgba(255,255,255,0.05)',
+                  border:`0.5px solid ${showNotes ? 'rgba(200,245,90,0.30)' : 'rgba(255,255,255,0.10)'}`,
+                  color: showNotes ? '#c8f55a' : 'rgba(255,255,255,0.4)',
+                  fontFamily:'var(--font-mono)', transition:'all 0.15s',
+                }}>♪ {showNotes ? 'Hide' : 'Show'} notes</button>
+              )}
               {chordHistory.length > 0 && (
                 <button onClick={() => setShowSave(true)} style={{
                   padding:'5px 14px', borderRadius:8, fontSize:12, cursor:'pointer',
@@ -232,6 +243,15 @@ export default function App() {
                 color: simplified ? '#c8f55a' : 'rgba(255,255,255,0.4)',
                 fontFamily:'var(--font-mono)',
               }}>{simplified ? '✦ Simple' : '✧ Simplify'}</button>
+              {fileNoteTimeline.length > 0 && (
+                <button onClick={() => setShowNotes(s => !s)} style={{
+                  padding:'6px 12px', borderRadius:8, fontSize:12, cursor:'pointer',
+                  background: showNotes ? 'rgba(200,245,90,0.10)' : 'rgba(255,255,255,0.05)',
+                  border:`0.5px solid ${showNotes ? 'rgba(200,245,90,0.30)' : 'rgba(255,255,255,0.10)'}`,
+                  color: showNotes ? '#c8f55a' : 'rgba(255,255,255,0.4)',
+                  fontFamily:'var(--font-mono)',
+                }}>♪ {showNotes ? 'Hide' : 'Show'} notes</button>
+              )}
               {chordHistory.length > 0 && (
                 <button onClick={() => setShowSave(true)} style={{
                   padding:'6px 12px', borderRadius:8, fontSize:12, cursor:'pointer',
@@ -347,10 +367,20 @@ export default function App() {
                   onSeek={seekTo}
                   isMobile={isMobile}
                 />
+                {showNotes && fileNoteTimeline.length > 0 && (
+                  <NoteTimeline
+                    noteTimeline={fileNoteTimeline}
+                    playbackTime={playbackTime}
+                    duration={duration}
+                    isMobile={isMobile}
+                  />
+                )}
                 <div style={{ display:'flex', alignItems:'center', gap:8, justifyContent:'center' }}>
-                  <span style={{ fontSize:11, color:'rgba(255,255,255,0.25)', fontFamily:'var(--font-mono)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth: isMobile ? 200 : 400 }}>♫ {fileName}</span>
+                  <span style={{ fontSize:11, color:'rgba(255,255,255,0.25)', fontFamily:'var(--font-mono)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth: isMobile ? 150 : 'auto' }}>
+                    {fileName}
+                  </span>
                   <button onClick={() => { setFileName(null); fileInputRef.current?.click() }}
-                    style={{ fontSize:11, color:'rgba(255,255,255,0.35)', background:'none', border:'0.5px solid rgba(255,255,255,0.1)', borderRadius:6, padding:'4px 10px', cursor:'pointer', flexShrink:0 }}>
+                    style={{ fontSize:11, color:'rgba(255,255,255,0.35)', background:'none', border:'0.5px solid rgba(255,255,255,0.1)', borderRadius:6, padding:'4px 10px', cursor:'pointer', transition:'all 0.15s' }}>
                     change
                   </button>
                   <input ref={fileInputRef} type="file" accept="audio/*" style={{ display:'none' }} onChange={e => handleFile(e.target.files[0])} />
@@ -404,7 +434,7 @@ export default function App() {
             onTouchEnd={e => { const r=e.currentTarget.getBoundingClientRect(); const t=e.changedTouches[0]; seekTo(Math.max(0,Math.min(1,((t.clientX-r.left)/r.width)))*duration) }}
           >
             <div style={{ position:'absolute', top:0, left:0, height:'100%', width:`${pct}%`, background:'var(--accent)', borderRadius:3, pointerEvents:'none' }} />
-            <div style={{ position:'absolute', top:'50%', left:`${pct}%`, transform:'translate(-50%,-50%)', width: isMobile?16:13, height: isMobile?16:13, background:'var(--accent)', borderRadius:'50%', pointerEvents:'none' }} />
+            <div style={{ position:'absolute', top:'50%', left:`${pct}%`, transform:'translate(-50%,-50%)', width: isMobile?16:13, height: isMobile?16:13, background:'var(--accent)', borderRadius:'50%', boxShadow:'0 0 8px rgba(200,245,90,0.3)', pointerEvents:'none' }} />
           </div>
 
           <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:'rgba(255,255,255,0.4)', flexShrink:0, minWidth:32, textAlign:'right' }}>
