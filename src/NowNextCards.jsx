@@ -126,7 +126,7 @@ function ChordCard({ chordName, role, keyRoot, timeUntil, isMobile = false }) {
   )
 }
 
-export default function NowNextCards({ currentChord, nextEntry, keyRoot, playbackTime, simplifyFn }) {
+export default function NowNextCards({ currentChord, nextEntry, keyRoot, playbackTime, simplifyFn, isMobile = false }) {
   const nextChord  = nextEntry?.chord || null
   const timeUntil  = nextEntry ? Math.max(0, nextEntry.time - playbackTime) : null
   const displayNow  = simplifyFn ? simplifyFn(currentChord) : currentChord
@@ -134,8 +134,8 @@ export default function NowNextCards({ currentChord, nextEntry, keyRoot, playbac
 
   return (
     <div style={{ display: 'flex', gap: isMobile ? '0.75rem' : '1rem', flexDirection: isMobile ? 'column' : 'row' }}>
-      <ChordCard chordName={displayNow}  role="now"  keyRoot={keyRoot} />
-      <ChordCard chordName={displayNext} role="next" keyRoot={keyRoot} timeUntil={timeUntil} />
+      <ChordCard chordName={displayNow}  role="now"  keyRoot={keyRoot} isMobile={isMobile} />
+      <ChordCard chordName={displayNext} role="next" keyRoot={keyRoot} timeUntil={timeUntil} isMobile={isMobile} />
     </div>
   )
 }
