@@ -9,6 +9,7 @@ import RulerTimeline from './RulerTimeline'
 import FilterPills from './FilterPills'
 import SaveModal from './SaveModal'
 import LiveMicView from './LiveMicView'
+import InstallPrompt from './InstallPrompt'
 
 function formatTime(s) {
   const m = Math.floor(s / 60)
@@ -421,6 +422,8 @@ export default function App() {
       {showSave && (
         <SaveModal onClose={() => setShowSave(false)} chordHistory={chordHistory} songKey={songKey} bpm={bpm} mode={mode} />
       )}
+
+      <InstallPrompt />
 
       {showTheme && (
         <ThemeSettings
