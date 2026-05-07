@@ -1,0 +1,76 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* ── Applied by useTheme.js — defaults match Dark theme ── */
+  --bg:           #0a0a0f;
+  --bg2:          #111118;
+  --bg3:          #18181f;
+  --bg4:          #1e1e28;
+  --text:         #f0f0f5;
+  --text2:        rgba(255,255,255,0.55);
+  --text3:        rgba(255,255,255,0.32);
+  --border:       rgba(255,255,255,0.07);
+  --border2:      rgba(255,255,255,0.14);
+  --surface:      rgba(255,255,255,0.03);
+  --header-bg:    rgba(10,10,15,0.96);
+  --card-bg:      #111118;
+  --input-bg:     #1e1e28;
+  --scrollbar:    rgba(255,255,255,0.08);
+
+  /* ── Accent — overridden by theme ── */
+  --accent:       #c8f55a;
+  --accent2:      #a8d93a;
+  --accent-dark:  #2a5500;
+
+  /* ── Semantic colours ── */
+  --red:          #ff6b6b;
+  --blue:         #6bb5ff;
+  --purple:       #b06bff;
+  --yellow:       #f5c84a;
+
+  /* ── Typography ── */
+  --font-display: 'DM Serif Display', serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+  --font-scale:   1;
+
+  /* ── Touch ── */
+  --tap-min: 44px;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+#root { min-height: 100vh; }
+
+/* Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar) transparent;
+}
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
+
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input[type=range] { cursor: pointer; accent-color: var(--accent); }
+
+/* Smooth theme transitions on key elements */
+div, header, button, span, p { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease; }
+
+@media (max-width: 640px) {
+  button { min-height: var(--tap-min); }
+  input[type=range] { height: 32px; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
