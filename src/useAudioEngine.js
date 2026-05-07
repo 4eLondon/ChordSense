@@ -5,6 +5,11 @@ function freqToMidi(freq) {
   return Math.round(12 * Math.log2(freq / 440) + 69)
 }
 
+function midiToNoteName(midi) {
+  const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+  return notes[midi % 12]
+}
+
 function detectPitches(analyser, sampleRate) {
   const bufferLength = analyser.frequencyBinCount
   const dataArray = new Float32Array(bufferLength)
@@ -34,6 +39,55 @@ function detectPitches(analyser, sampleRate) {
     }
   }
   return [...notes]
+}
+
+// ── NEW: Detailed note detection with confidence ──────────────────────────────
+function detectNotesWithConfidence(analyser, sampleRate) {
+  const bufferLength = analyser.frequencyBinCount
+  const dataArray = new Float32Array(bufferLength)
+  analyser.getFloatFrequencyData(dataArray)
+
+  const nyquist = sampleRate / 2
+  const freqPerBin = nyquist / bufferLength
+  const minBin = Math.floor(27.5 / freqPerBin)
+  const maxBin = Math.ceil(4200 / freqPerBin)
+  const threshold = -50
+
+  const midiNotes = new Map() // midi -> { freq, magnitude, confidence }
+
+  for (let i = Math.max(1, minBin); i < Math.min(maxBin, bufferLength - 1); i++) {
+    if (dataArray[i] > threshold && dataArray[i] > dataArray[i - 1] && dataArray[i] > dataArray[i + 1]) {
+      const denom = dataArray[i - 1] - 2 * dataArray[i] + dataArray[i + 1]
+      const delta = denom !== 0 ? 0.5 * (dataArray[i - 1] - dataArray[i + 1]) / denom : 0
+      const refinedFreq = (i + delta) * freqPerBin
+      
+      if (refinedFreq > 27 && refinedFreq < 4200) {
+        const midi = freqToMidi(refinedFreq)
+        if (midi >= 21 && midi <= 108) {
+          const pcMidi = midi % 12
+          const mag = dataArray[i]
+          
+          // Confidence is a function of magnitude and spectral prominence
+          const prominence = dataArray[i] - Math.max(dataArray[i - 1], dataArray[i + 1])
+          const confidence = Math.min(1, (mag + 50) / 50) * Math.min(1, prominence / 20)
+          
+          if (!midiNotes.has(pcMidi) || mag > midiNotes.get(pcMidi).magnitude) {
+            midiNotes.set(pcMidi, { freq: refinedFreq, magnitude: mag, confidence })
+          }
+        }
+      }
+    }
+  }
+  
+  return Array.from(midiNotes.entries())
+    .map(([midi, data]) => ({
+      midi,
+      name: midiToNoteName(midi),
+      frequency: data.freq,
+      magnitude: data.magnitude,
+      confidence: data.confidence,
+    }))
+    .sort((a, b) => b.confidence - a.confidence)
 }
 
 const PC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
@@ -78,7 +132,7 @@ function formatTime(secs) {
 }
 
 
-// ── Pure JS FFT ───────────────────────────────────────────────────────────────
+// ── Pure JS FFT ──────────────────────────────────────────────────────────[...]
 // Replaces OfflineAudioContext per-frame analysis.
 // Cooley-Tukey in-place FFT — input must be power-of-2 length.
 function computeFFTMag(samples) {
@@ -150,6 +204,48 @@ function detectPitchesFromMag(mag, sampleRate, frameSize) {
   return [...notes]
 }
 
+// ── NEW: Detect notes from magnitude spectrum with confidence ──────────────────
+function detectNotesFromMag(mag, sampleRate) {
+  const nyquist = sampleRate / 2
+  const freqPerBin = nyquist / mag.length
+  const minBin = Math.floor(27.5 / freqPerBin)
+  const maxBin = Math.ceil(4200 / freqPerBin)
+  const threshold = -50
+
+  const midiNotes = new Map()
+
+  for (let i = Math.max(1, minBin); i < Math.min(maxBin, mag.length - 1); i++) {
+    if (mag[i] > threshold && mag[i] > mag[i - 1] && mag[i] > mag[i + 1]) {
+      const denom = mag[i - 1] - 2 * mag[i] + mag[i + 1]
+      const delta = denom !== 0 ? 0.5 * (mag[i - 1] - mag[i + 1]) / denom : 0
+      const freq = (i + delta) * freqPerBin
+
+      if (freq > 27 && freq < 4200) {
+        const midi = Math.round(12 * Math.log2(freq / 440) + 69)
+        if (midi >= 21 && midi <= 108) {
+          const pcMidi = midi % 12
+          const prominence = mag[i] - Math.max(mag[i - 1], mag[i + 1])
+          const confidence = Math.min(1, (mag[i] + 50) / 50) * Math.min(1, prominence / 20)
+
+          if (!midiNotes.has(pcMidi) || mag[i] > midiNotes.get(pcMidi).magnitude) {
+            midiNotes.set(pcMidi, { freq, magnitude: mag[i], confidence })
+          }
+        }
+      }
+    }
+  }
+
+  return Array.from(midiNotes.entries())
+    .map(([midi, data]) => ({
+      midi,
+      name: midiToNoteName(midi),
+      frequency: data.freq,
+      magnitude: data.magnitude,
+      confidence: data.confidence,
+    }))
+    .sort((a, b) => b.confidence - a.confidence)
+}
+
 export function useAudioEngine() {
   const audioCtxRef = useRef(null)
   const analyserRef = useRef(null)
@@ -184,9 +280,10 @@ export function useAudioEngine() {
   const [songKey, setSongKey] = useState(null)
   const [bpm, setBpm] = useState(null)
   const [fileChordTimeline, setFileChordTimeline] = useState([])
-  const [pitchClassAccum, setPitchClassAccum] = useState(new Float32Array(12)) // live accumulator for key detection
+  const [fileNoteTimeline, setFileNoteTimeline] = useState([]) // ← NEW: note timeline
+  const [pitchClassAccum, setPitchClassAccum] = useState(new Float32Array(12))
 
-  // ── Mic ───────────────────────────────────────────────────────────────────
+  // ── Mic ─────────────────────────────────────────────────────────────
 
   const startMic = useCallback(async () => {
     try {
@@ -265,7 +362,7 @@ export function useAudioEngine() {
     setPitchClassAccum(new Float32Array(12))
   }, [])
 
-  // ── File analysis ─────────────────────────────────────────────────────────
+  // ── File analysis ────────────────────────────────────────────────────────
 
   const analyzeFile = useCallback(async (file) => {
     try {
@@ -273,6 +370,7 @@ export function useAudioEngine() {
       setIsAnalyzingFile(true)
       setFileProgress(0)
       setFileChordTimeline([])
+      setFileNoteTimeline([]) // ← NEW: reset note timeline
       setSongKey(null)
       setBpm(null)
       setCurrentChord(null)
@@ -300,6 +398,7 @@ export function useAudioEngine() {
       const frameSize   = 4096   // must be power of 2
       const hopSize     = Math.floor(sampleRate * 0.35) // ~0.35s between frames
       const timeline    = []
+      const noteTimeline = [] // ← NEW: timeline for individual notes
       const allPitchClasses = new Array(12).fill(0)
       const totalFrames = Math.floor((channelData.length - frameSize) / hopSize)
 
@@ -318,6 +417,7 @@ export function useAudioEngine() {
 
         const mag     = computeFFTMag(windowed)
         const pitches = detectPitchesFromMag(mag, sampleRate, frameSize)
+        const notes   = detectNotesFromMag(mag, sampleRate) // ← NEW: get individual notes
 
         if (pitches.length >= 2) {
           const chord     = pitchClassesToChord(pitches)
@@ -328,6 +428,19 @@ export function useAudioEngine() {
             if (!last || last.chord !== chord) {
               timeline.push({ chord, time: timestamp, notes: pitches.map(pc => PC[pc]), timeLabel: formatTime(timestamp) })
             }
+          }
+        }
+
+        // ← NEW: Record note timeline entry
+        if (notes.length > 0) {
+          const timestamp = offset / sampleRate
+          const lastNoteEntry = noteTimeline[noteTimeline.length - 1]
+          if (!lastNoteEntry || JSON.stringify(lastNoteEntry.notes) !== JSON.stringify(notes)) {
+            noteTimeline.push({
+              time: timestamp,
+              timeLabel: formatTime(timestamp),
+              notes: notes,
+            })
           }
         }
 
@@ -357,6 +470,7 @@ export function useAudioEngine() {
 
       setFileProgress(100)
       setFileChordTimeline(timeline)
+      setFileNoteTimeline(noteTimeline) // ← NEW: set note timeline
       setChordHistory(timeline.slice().reverse().map(e => ({ chord: e.chord, time: e.timeLabel })))
       if (timeline.length > 0) setCurrentChord(timeline[0].chord)
       await ctx.close()
@@ -367,7 +481,7 @@ export function useAudioEngine() {
     }
   }, [])
 
-  // ── Playback ──────────────────────────────────────────────────────────────
+  // ── Playback ──────────────────────────────────────────────────────────
 
   const startPlayback = useCallback((fromOffset = 0) => {
     if (!audioBufferRef.current) return
@@ -457,7 +571,7 @@ export function useAudioEngine() {
     isListening, startMic, stopMic,
     pitchClassAccum,
     isAnalyzingFile, fileProgress, analyzeFile,
-    fileChordTimeline, songKey, bpm,
+    fileChordTimeline, fileNoteTimeline, songKey, bpm, // ← NEW: export note timeline
     isPlaying, playbackTime, duration, togglePlayback, seekTo,
     currentChord, detectedNotes, chordHistory,
     volume, error,
